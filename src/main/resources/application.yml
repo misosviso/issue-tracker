@@ -4,6 +4,6 @@ spring:
 
 google:
   sheets:
-    credentials-file: credentials.json   # place in resources
+    credentials-file: credentials.json
     application-name: IssueTracker
     spreadsheet-id: 17UIU87doUWvKsMwXrW3o7fJY5ja2GWwtYgUM_18T3xU

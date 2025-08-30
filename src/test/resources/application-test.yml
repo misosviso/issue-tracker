@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: issuetracker
+
+google:
+  sheets:
+    credentials-file: credentials-test.json
+    application-name: IssueTrackerTest
+    spreadsheet-id: 1cmDYTSe6G4Z2YD6guOwz6vPoNfJWUFitseY9NLuU2-g

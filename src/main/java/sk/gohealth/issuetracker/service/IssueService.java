@@ -7,8 +7,8 @@ import sk.gohealth.issuetracker.domain.IssueRepository;
 import sk.gohealth.issuetracker.domain.Status;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service

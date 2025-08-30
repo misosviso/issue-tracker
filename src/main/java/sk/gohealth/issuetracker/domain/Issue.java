@@ -1,15 +1,19 @@
 package sk.gohealth.issuetracker.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class Issue {
     private UUID id;
     private String description;
@@ -25,6 +29,10 @@ public class Issue {
         this.status = status;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = null;
+    }
+
+    public String print() {
+        return this.getId() + " " + this.getDescription() + " " + this.getStatus().name();
     }
 }
 
