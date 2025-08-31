@@ -1,5 +1,7 @@
 package sk.gohealth.issuetracker.integrations.googlesheets;
 
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.stereotype.Component;
 import sk.gohealth.issuetracker.domain.Issue;
 import sk.gohealth.issuetracker.domain.IssueAdapter;

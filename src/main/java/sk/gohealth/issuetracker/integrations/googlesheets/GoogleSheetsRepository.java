@@ -4,7 +4,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import java.util.*;
 public class GoogleSheetsRepository implements IssueRepository {
 
     public static final String ISSUES_RANGE = "Issues!A:F";
+    public static final String ISSUES_RANGE_FORMATTED = "Issues!A%d:F%d";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 
@@ -79,12 +80,11 @@ public class GoogleSheetsRepository implements IssueRepository {
             values = ensureHeaders(values);
 
             int rowIndex = findRowIndexById(values, issue.getId().toString());
-            List<Object> newRow = adapter.toStorage(issue);
 
             if (rowIndex == -1) {
-                appendRow(newRow);
+                appendRow(issue);
             } else {
-                updateRow(rowIndex, newRow);
+                updateRow(rowIndex, issue);
             }
 
             return issue;
@@ -115,7 +115,7 @@ public class GoogleSheetsRepository implements IssueRepository {
     }
 
     private int findRowIndexById(List<List<Object>> values, String issueId) {
-        for (int i = 1; i < values.size(); i++) { // skip header row
+        for (int i = 1; i < values.size(); i++) {
             List<Object> row = values.get(i);
             if (!row.isEmpty() && row.get(0).equals(issueId)) {
                 return i;
@@ -124,7 +124,9 @@ public class GoogleSheetsRepository implements IssueRepository {
         return -1;
     }
 
-    private void appendRow(List<Object> row) throws IOException {
+    private void appendRow( Issue issue) throws IOException {
+        List<Object> row = adapter.toStorage(issue);
+
         ValueRange appendBody = new ValueRange().setValues(Collections.singletonList(row));
         sheetsService.spreadsheets().values()
                 .append(spreadsheetId, ISSUES_RANGE, appendBody)
@@ -132,8 +134,10 @@ public class GoogleSheetsRepository implements IssueRepository {
                 .execute();
     }
 
-    private void updateRow(int rowIndex, List<Object> row) throws IOException {
-        String range = String.format("Issues!A%d:F%d", rowIndex + 1, rowIndex + 1);
+    private void updateRow(int rowIndex, Issue issue) throws IOException {
+        List<Object> row = adapter.toStorage(issue);
+
+        String range = String.format(ISSUES_RANGE_FORMATTED, rowIndex + 1, rowIndex + 1);
         ValueRange updateBody = new ValueRange().setValues(Collections.singletonList(row));
         sheetsService.spreadsheets().values()
                 .update(spreadsheetId, range, updateBody)
@@ -150,8 +154,8 @@ public class GoogleSheetsRepository implements IssueRepository {
             if (values == null || values.size() <= 1)
                 return Optional.empty();
 
-            // skip headers
-            for (List<Object> row : values.subList(1, values.size())) {
+            List<List<Object>> valuesWithoutHeaders = values.subList(1, values.size());
+            for (List<Object> row : valuesWithoutHeaders) {
                 if (!row.isEmpty() && row.get(0).equals(id)) {
                     return Optional.of(adapter.toDomain(row));
                 }
