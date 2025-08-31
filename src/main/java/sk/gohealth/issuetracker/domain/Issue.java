@@ -31,8 +31,12 @@ public class Issue {
         this.updatedAt = null;
     }
 
-    public String print() {
+    public String stringValue() {
         return this.getId() + " " + this.getDescription() + " " + this.getStatus().name();
+    }
+
+    public void print() {
+        System.out.println(this.stringValue());
     }
 }
 
